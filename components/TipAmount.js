@@ -1,16 +1,22 @@
 import * as React from 'react'
-import {Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
-const TipAmount = () =>{
+const TipAmount = ({tips}) =>{
     return (
-        <Text style = {styles.tip}>Tip Amount</Text>
+        <View>
+            <Text style = {styles.header}>Tip Amount</Text>
+            <Text style = {styles.tip}>{tips}</Text>
+        </View>
     )
 }
 const styles = StyleSheet.create({
-    tip: {
+    header: {
         fontSize: 20,
         textAlign: 'center',
         padding: 10,
     },
+    tip: {
+        textAlign: 'center',
+    }
 })
 export default TipAmount;

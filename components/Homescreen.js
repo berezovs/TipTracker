@@ -7,24 +7,90 @@ import TipAmount from './TipAmount'
 import {openDatabase} from '../database/database.js';
 
 
-const HomeScreen = ({navigation, screenOptions}) => {
+const HomeScreen = ({navigation}) => {
     const db = openDatabase();
-    console.log(screenOptions)
-
+    
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [date, setDate] = useState(new Date());
     const [tip, setTip] = useState('');
     const [message, setMessage] = useState('');
-
+    const [tipMode, setTipMode] = useState(0);
+    const [tips, setTips] = useState(0);
+   
 
     useEffect(() => {
         db.transaction((transaction)=>{
-            transaction.executeSql("drop table tips;");
+            transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);")
         })
-        db.transaction((transaction)=>{
-            transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip numeric NOT null, message text NOT null, date numeric NOT null);")
-        })
+
+        getWeeklyTips();
     }, []);
+
+
+    useEffect(() => {
+        switch(tipMode){
+            case 0:
+                getWeeklyTips();
+                break;
+            case 1:
+                getMonthlyTips();
+                break;
+            case 2:
+                getYearlyTips();
+                break;
+            default:
+                console.error("unknown");
+        }
+    }, [tipMode]);
+
+    const buildDateString = (year, month, day) =>{
+        let dateString = '';
+        dateString+=year.toString();
+        dateString+='-';
+        if (month<=9){
+          dateString+='0';
+          dateString+=month.toString();
+        }else{
+          dateString+=month.toString();
+        }
+      
+        dateString+='-'
+      
+        if (day<=9){
+          dateString+='0';
+          dateString+=day.toString();
+        }else{
+          dateString+=day.toString();
+        }
+        
+        return dateString;
+      } 
+
+
+
+    const getWeeklyTips = () =>{
+        db.transaction((transaction)=>{
+            transaction.executeSql("select tip, date from tips where strftime('%W', date)=strftime('%W', 'now')", [], (transaction, result)=>{
+                let accumulator = 0
+                for(let i=0; i<result.rows.length; i++){
+                    accumulator+=parseInt(result.rows.item(i).tip);
+               }
+               setTips(accumulator);
+            });
+        })
+    }
+
+    const getMonthlyTips = () => {
+
+    }
+
+    const getYearlyTips = () => {
+
+    }
+
+  const setTipDisplayMode = (mode) => {
+        setTipMode(mode);
+    }
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -48,31 +114,21 @@ const HomeScreen = ({navigation, screenOptions}) => {
   }
 
   const addTip = () => {
-       
-      db.transaction(async (transaction)=>{
-       await transaction.executeSql("insert into tips(tip, message, date) values(?, ?, ?);", [tip, message, date.getMonth()+"/"+date.getDate()+"/"+date.getFullYear()] ) 
-       setTip('');
-       setMessage('');
-        
-    });
+    const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
     db.transaction(async (transaction)=>{
-        await transaction.executeSql("select * from tips", [], (transaction, result)=>{
-            for(let i = 0; i< result.rows.length; i++){
-                console.log(result.rows.item(i))
-            }
-            
-        }) 
-         
-     });
-       
+       await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
+    setTip('');
+    setMessage('');
+    getWeeklyTips();
+    });     
   }
 
 
     return (
       <View style = {styles.container}>
             <Header navigation = {navigation}/>
-            <ButtonGroup />
-            <TipAmount />
+            <ButtonGroup setTipDisplayMode={setTipDisplayMode}/>
+            <TipAmount tips={tips}/>
             <TextInput 
                 style = {styles.input}
                 value = {tip}
@@ -88,7 +144,7 @@ const HomeScreen = ({navigation, screenOptions}) => {
                 onChangeText = {onChangeMessage}
             />
             <View style = {styles.date}>
-                <Text style = {styles.currentDate}>{date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear()}</Text>
+                <Text style = {styles.currentDate}>{(date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()}</Text>
                 <Text style = {styles.changeBtn} onPress = {showDatePicker}>change</Text>
             </View>
             <DateTimePickerModal

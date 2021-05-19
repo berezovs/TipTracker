@@ -1,12 +1,16 @@
-import  React, {useState} from 'react';
+import  React, {useState, useEffect} from 'react';
 import {StyleSheet} from 'react-native';
 import { ButtonGroup } from "react-native-elements";
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-const Buttons = ()=>{
+const Buttons = ({navigation, setTipDisplayMode})=>{
     const options = ["Week", "Month", "Year"];
     const [selectedIndex, setSelectedIndex] = useState(0)
 
+    useEffect(()=>{
+        setTipDisplayMode(selectedIndex)
+    }, [selectedIndex])
     return (
         <ButtonGroup
             buttons={options}
