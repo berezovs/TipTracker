@@ -8,14 +8,14 @@ import {openDatabase} from '../database/database.js';
 
 
 const HomeScreen = ({navigation}) => {
-    const db = openDatabase();
-    
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [date, setDate] = useState(new Date());
     const [tip, setTip] = useState('');
     const [message, setMessage] = useState('');
     const [tipMode, setTipMode] = useState(0);
     const [tips, setTips] = useState(0);
+
+    const db = openDatabase();
    
 
     useEffect(() => {
@@ -62,7 +62,6 @@ const HomeScreen = ({navigation}) => {
         }else{
           dateString+=day.toString();
         }
-        
         return dateString;
       } 
 
@@ -88,40 +87,40 @@ const HomeScreen = ({navigation}) => {
 
     }
 
-  const setTipDisplayMode = (mode) => {
+    const setTipDisplayMode = (mode) => {
         setTipMode(mode);
     }
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+        const showDatePicker = () => {
+        setDatePickerVisibility(true);
+    };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+    const hideDatePicker = () => {
+        setDatePickerVisibility(false);
+    };
 
-  const handleConfirm = (date) => {
-    setDate(date);
-    hideDatePicker();
-  };
+    const handleConfirm = (date) => {
+        setDate(date);
+        hideDatePicker();
+    };
 
-  const onChangeMessage = (text) => {
-      setMessage(text);
-  }
+    const onChangeMessage = (text) => {
+        setMessage(text);
+    }
 
-  const onChangeTip = (tip) => {
-      setTip(tip);
-  }
+    const onChangeTip = (tip) => {
+        setTip(tip);
+    }
 
-  const addTip = () => {
-    const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
-    db.transaction(async (transaction)=>{
-       await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
-    setTip('');
-    setMessage('');
-    getWeeklyTips();
-    });     
-  }
+    const addTip = () => {
+        const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
+        db.transaction(async (transaction)=>{
+        await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
+        setTip('');
+        setMessage('');
+        getWeeklyTips();
+        });     
+    }
 
 
     return (
