@@ -14,14 +14,19 @@ const createTipsTable = () =>{
 }
 
 const queries = {
+   selectQueries : { 
    0: "select tip, date from tips where strftime('%W', date)=strftime('%W', 'now')",
    1: "select tip, date from tips where strftime('%m', date)=strftime('%m', 'now')",
    2: "select tip, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
+},
+   insertQueries: {insertTip: "insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));"},
+   deleteQueries: {}
+  
 }
 
 const getTipsForSelectedPeriod = (mode, setTips) =>{
    db.transaction((transaction)=>{
-      transaction.executeSql(queries[mode], [], (_, {rows: {_array}})=>{
+      transaction.executeSql(queries.selectQueries[mode], [], (_, {rows: {_array}})=>{
       setTips(calculateTips(_array));
       });
    });
@@ -29,7 +34,7 @@ const getTipsForSelectedPeriod = (mode, setTips) =>{
 
 const insertTip = (tip, message, stringDate) => {
    db.transaction(async (transaction)=>{
-      await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
+      await transaction.executeSql(queries.insertQueries.insertTip, [tip, message, stringDate, stringDate ] ) 
       }); 
 }
 
