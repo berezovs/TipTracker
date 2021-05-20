@@ -1,8 +1,44 @@
 import * as SQLite from 'expo-sqlite';
 
-const openDatabase = () => {
-   return SQLite.openDatabase("db.db");
+
+let db;
+
+const createDatabase = () => {
+   db = SQLite.openDatabase("db.db");
+}
+
+const createTipsTable = () =>{
+   db.transaction((transaction)=>{
+      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);")
+  })
+}
+
+const queries = {
+   0: "select tip, date from tips where strftime('%W', date)=strftime('%W', 'now')",
+   1: "select tip, date from tips where strftime('%m', date)=strftime('%m', 'now')",
+   2: "select tip, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
+}
+
+const getTipsForSelectedPeriod = (mode, setTips) =>{
+   db.transaction((transaction)=>{
+      transaction.executeSql(queries[mode], [], (_, {rows: {_array}})=>{
+      setTips(calculateTips(_array));
+      });
+   });
+}
+
+const insertTip = (tip, message, stringDate) => {
+   db.transaction(async (transaction)=>{
+      await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
+      }); 
+}
+
+const calculateTips = (array) => {
+   
+   return array.map((tipObj)=>{return parseInt(tipObj.tip);})
+               .reduce((acc, tip)=>{return acc + tip;});
+
 }
 
 
-export {openDatabase};
+export {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip};

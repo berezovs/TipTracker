@@ -4,7 +4,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import ButtonGroup from './ButtonGroup';
 import Header from './Header';
 import TipAmount from './TipAmount'
-import {openDatabase} from '../database/database.js';
+import {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip} from '../database/database.js';
 
 
 const HomeScreen = ({navigation}) => {      
@@ -15,38 +15,21 @@ const HomeScreen = ({navigation}) => {
     const [tipMode, setTipMode] = useState(0);
     const [tips, setTips] = useState(0);
 
-    const db = openDatabase();
+    createDatabase();
    
 
     useEffect(() => {
-        db.transaction((transaction)=>{
-            transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);")
-        })
-
-        getTipsForSelectedPeriod(tipMode);
+        createTipsTable();
+        showTips();
     }, []);
 
 
     useEffect(() => {
-        getTipsForSelectedPeriod(tipMode)
+        showTips();
     }, [tipMode]);
 
 
-    const getTipsForSelectedPeriod = (mode) =>{
-        switch(tipMode){
-            case 0:
-                getWeeklyTips();
-                break;
-            case 1:
-                getMonthlyTips();
-                break;
-            case 2:
-                getYearlyTips();
-                break;
-            default:
-                console.error("unknown");
-        }
-    }
+   
 
     const buildDateString = (year, month, day) =>{
         let dateString = '';
@@ -71,48 +54,11 @@ const HomeScreen = ({navigation}) => {
       } 
 
 
-
-    const getWeeklyTips = () =>{
-        db.transaction((transaction)=>{
-            transaction.executeSql("select tip, date from tips where strftime('%W', date)=strftime('%W', 'now')", [], (transaction, result)=>{
-                let accumulator = 0
-                for(let i=0; i<result.rows.length; i++){
-                    accumulator+=parseInt(result.rows.item(i).tip);
-               }
-               setTips(accumulator);
-            });
-        })
-    }
-
-    const getMonthlyTips = () => {
-        db.transaction((transaction)=>{
-            transaction.executeSql("select tip, date from tips where strftime('%m', date)=strftime('%m', 'now')", [], (transaction, result)=>{
-                let accumulator = 0
-                for(let i=0; i<result.rows.length; i++){
-                    accumulator+=parseInt(result.rows.item(i).tip);
-               }
-               setTips(accumulator);
-            });
-        });
-    }
-
-    const getYearlyTips = () => {
-        db.transaction((transaction)=>{
-            transaction.executeSql("select tip, date from tips where strftime('%Y', date)=strftime('%Y', 'now')", [], (transaction, result)=>{
-                let accumulator = 0
-                for(let i=0; i<result.rows.length; i++){
-                    accumulator+=parseInt(result.rows.item(i).tip);
-               }
-               setTips(accumulator);
-            });
-        });
-    }
-
     const setTipDisplayMode = (mode) => {
         setTipMode(mode);
     }
 
-        const showDatePicker = () => {
+    const showDatePicker = () => {
         setDatePickerVisibility(true);
     };
 
@@ -135,13 +81,17 @@ const HomeScreen = ({navigation}) => {
 
     const addTip = () => {
         const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
-        db.transaction(async (transaction)=>{
-        await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
+        insertTip(tip, message, stringDate);
         setTip('');
         setMessage('');
-        getTipsForSelectedPeriod(tipMode);
-        });     
+        showTips();  
     }
+
+    const showTips = () =>{
+        getTipsForSelectedPeriod(tipMode, setTips);  
+    }
+
+
 
 
     return (
@@ -215,3 +165,5 @@ const styles = StyleSheet.create({
 })
 
 export default HomeScreen;
+
+
