@@ -7,7 +7,7 @@ import TipAmount from './TipAmount'
 import {openDatabase} from '../database/database.js';
 
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({navigation}) => {      
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [date, setDate] = useState(new Date());
     const [tip, setTip] = useState('');
@@ -23,11 +23,16 @@ const HomeScreen = ({navigation}) => {
             transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);")
         })
 
-        getWeeklyTips();
+        getTipsForSelectedPeriod(tipMode);
     }, []);
 
 
     useEffect(() => {
+        getTipsForSelectedPeriod(tipMode)
+    }, [tipMode]);
+
+
+    const getTipsForSelectedPeriod = (mode) =>{
         switch(tipMode){
             case 0:
                 getWeeklyTips();
@@ -41,7 +46,7 @@ const HomeScreen = ({navigation}) => {
             default:
                 console.error("unknown");
         }
-    }, [tipMode]);
+    }
 
     const buildDateString = (year, month, day) =>{
         let dateString = '';
@@ -80,11 +85,27 @@ const HomeScreen = ({navigation}) => {
     }
 
     const getMonthlyTips = () => {
-
+        db.transaction((transaction)=>{
+            transaction.executeSql("select tip, date from tips where strftime('%m', date)=strftime('%m', 'now')", [], (transaction, result)=>{
+                let accumulator = 0
+                for(let i=0; i<result.rows.length; i++){
+                    accumulator+=parseInt(result.rows.item(i).tip);
+               }
+               setTips(accumulator);
+            });
+        });
     }
 
     const getYearlyTips = () => {
-
+        db.transaction((transaction)=>{
+            transaction.executeSql("select tip, date from tips where strftime('%Y', date)=strftime('%Y', 'now')", [], (transaction, result)=>{
+                let accumulator = 0
+                for(let i=0; i<result.rows.length; i++){
+                    accumulator+=parseInt(result.rows.item(i).tip);
+               }
+               setTips(accumulator);
+            });
+        });
     }
 
     const setTipDisplayMode = (mode) => {
@@ -118,7 +139,7 @@ const HomeScreen = ({navigation}) => {
         await transaction.executeSql("insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));", [tip, message, stringDate, stringDate ] ) 
         setTip('');
         setMessage('');
-        getWeeklyTips();
+        getTipsForSelectedPeriod(tipMode);
         });     
     }
 
