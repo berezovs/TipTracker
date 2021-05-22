@@ -15,9 +15,9 @@ const createTipsTable = () =>{
 
 const queries = {
    selectQueries : { 
-   0: "select tip, date from tips where strftime('%W', date)=strftime('%W', 'now')",
-   1: "select tip, date from tips where strftime('%m', date)=strftime('%m', 'now')",
-   2: "select tip, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
+   0: "select id, tip, message, date from tips where strftime('%W', date)=strftime('%W', 'now')",
+   1: "select id, tip, message, date from tips where strftime('%m', date)=strftime('%m', 'now')",
+   2: "select id, tip, message, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
 },
    insertQueries: {insertTip: "insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));"},
    deleteQueries: {}
@@ -28,6 +28,7 @@ const getTipsForSelectedPeriod = (mode, setTips) =>{
    db.transaction((transaction)=>{
       transaction.executeSql(queries.selectQueries[mode], [], (_, {rows: {_array}})=>{
       setTips(calculateTips(_array));
+      console.log(_array);
       });
    });
 }
@@ -38,12 +39,21 @@ const insertTip = (tip, message, stringDate) => {
       }); 
 }
 
+const getArrayOfTipObj = (mode, setTipsArray) =>{
+   db.transaction((transaction)=>{
+      transaction.executeSql(queries.selectQueries[mode], [], (_,{rows:{_array}})=>{
+         setTipsArray(_array);
+        
+      });
+   });
+}
+
 const calculateTips = (array) => {
    
-   return array.map((tipObj)=>{return parseInt(tipObj.tip);})
+   return (array==null) ? 0 : array.map((tipObj)=>{return parseInt(tipObj.tip);})
                .reduce((acc, tip)=>{return acc + tip;});
 
 }
 
 
-export {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip};
+export {createDatabase, createTipsTable, getTipsForSelectedPeriod, getArrayOfTipObj, insertTip};
