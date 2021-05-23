@@ -28,7 +28,6 @@ const getTipsForSelectedPeriod = (mode, setTips) =>{
    db.transaction((transaction)=>{
       transaction.executeSql(queries.selectQueries[mode], [], (_, {rows: {_array}})=>{
       setTips(calculateTips(_array));
-      console.log(_array);
       });
    });
 }

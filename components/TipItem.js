@@ -5,7 +5,7 @@ import {ListItem} from 'react-native-elements';
 
 const TipItem = ({item}) => {
     return(
-    <ListItem key = {item.tip.id} bottomDivider style={styles.container}>
+    <ListItem bottomDivider style={styles.container}>
         <ListItem.Content>
             <ListItem.Title>Tip: {item.tip.tip}</ListItem.Title>
             <ListItem.Subtitle>Message: {item.tip.message}</ListItem.Subtitle>
@@ -18,7 +18,7 @@ const TipItem = ({item}) => {
 
 const styles = StyleSheet.create({
     container: {
-        width: 400,
+        width: 350,
     }
 })
 

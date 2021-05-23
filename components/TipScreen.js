@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from'react'
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, FlatList, SafeAreaView, TouchableWithoutFeedback} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import Header from './Header';
 import TipAmount from './TipAmount';
@@ -48,7 +48,7 @@ const TipScreen = ({navigation}) =>{
 
     const showTipsList = async() => {
         await getArrayOfTipObj(tipMode, setTipsArray);
-        console.log(tipsArray);
+        
     }
 
 
@@ -68,19 +68,25 @@ const TipList = ({tipsArray}) => {
     }
 
     else{
-        return <View>
-        {      
-            tipsArray.map((item, index)=>(
-                <TipItem item ={{tip:item}}/>
-            ))
-        }
-    </View>
+        return(
+            <View style = {{flex: 1}}>
+                <FlatList 
+                keyExtractor = {(item, index)=>index.toString()}
+                data = {tipsArray}
+                renderItem = {({item})=>(<TipItem item ={{tip:item}}
+                />)}
+                
+                /> 
+            </View> 
+        
+        )
     }
 }
 
 
 const styles = StyleSheet.create({
     container : {
+        flex: 1,
         alignItems: "center",
     }
 })
