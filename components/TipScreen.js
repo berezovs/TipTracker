@@ -84,10 +84,11 @@ const TipList = ({tipsArray, refreshList}) => {
         return(
             <View style = {{flex: 1}}>
                 <FlatList 
+                showsVerticalScrollIndicator ={false}
+                showsHorizontalScrollIndicator={false}
                 keyExtractor = {(item, index)=>index.toString()}
                 data = {tipsArray}
                 renderItem = {({item})=>(<TipItem item ={{tip:item, delete: deleteTip}}
-                showsVerticalScrollIndicator ={false}
                 />)} 
                 /> 
             </View> 

@@ -1,10 +1,9 @@
 import * as SQLite from 'expo-sqlite';
 
 
-let db=null;
+let db = null;
 
 const createDatabase = () => {
-    if(!db)
         db = SQLite.openDatabase("db.db");
 //    console.log(db)
 }
@@ -16,7 +15,6 @@ const createTipsTable = () =>{
    db.transaction((transaction)=>{
 
       transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);", (transaction, result)=>{
-          console.log(result,"Success");
       });
   })
 }
