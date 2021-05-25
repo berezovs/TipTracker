@@ -1,15 +1,23 @@
 import * as SQLite from 'expo-sqlite';
 
 
-let db;
+let db=null;
 
 const createDatabase = () => {
-   db = SQLite.openDatabase("db.db");
+    if(!db)
+        db = SQLite.openDatabase("db.db");
+//    console.log(db)
 }
 
 const createTipsTable = () =>{
+    // db.transaction((tx)=>{
+    //     tx.executeSql("drop table tips", [], (_,r)=>{}, (error)=>{console.log('error')})
+    // })
    db.transaction((transaction)=>{
-      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);")
+
+      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);", (transaction, result)=>{
+          console.log(result,"Success");
+      });
   })
 }
 
@@ -49,9 +57,9 @@ const getArrayOfTipObj = (mode, setTipsArray) =>{
 
 const deleteTipById = (id, setSuccessDelete) =>{
    db.transaction( async(transaction)=>{
-     await transaction.executeSql(queries.deleteQueries.deleteTipById, [id.toString()], (transaction, result)=>{
-         setSuccessDelete(true);   
-      }, (err)=>{console.log("err")});
+     await transaction.executeSql(queries.deleteQueries.deleteTipById, [id], (transaction, result)=>{
+         setSuccessDelete(true);  
+      });
    });
 }
 

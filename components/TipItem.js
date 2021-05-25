@@ -4,19 +4,16 @@ import {ListItem, Icon} from 'react-native-elements';
 
 
 const TipItem = ({item}) => {
-    const[id, setId] = useState(item.tip.id);
-
-    
 
     const deleteItem = () =>{
-        item.delete(id);
+        item.delete(item.tip.id);
     }
 
     return(
     <ListItem bottomDivider style={styles.container}>
         <ListItem.Content>
             <ListItem.Title>Tip: {item.tip.tip}</ListItem.Title>
-            <ListItem.Subtitle>Message: {item.tip.message}</ListItem.Subtitle>
+            <ListItem.Subtitle>Message: {item.tip.id}</ListItem.Subtitle>
             <ListItem.Subtitle>Date: {item.tip.date}</ListItem.Subtitle>
         </ListItem.Content>
         <Icon Component={TouchableOpacity} name='delete-outline' color='grey' onPress={deleteItem} style={styles.delete}/>
