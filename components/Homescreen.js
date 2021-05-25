@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {Text, TextInput,StyleSheet, View, Button, StatusBar} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useFocusEffect } from '@react-navigation/native';
 import ButtonGroup from './ButtonGroup';
 import Header from './Header';
 import TipAmount from './TipAmount'
@@ -26,9 +27,11 @@ const HomeScreen = ({navigation}) => {
 
     useEffect(() => {
         showTips();
-    }, [tipMode]);
+    }, [tipMode, tips]);
 
-
+    useFocusEffect(()=>{
+        showTips();
+    });
    
 
     const buildDateString = (year, month, day) =>{

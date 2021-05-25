@@ -20,14 +20,15 @@ const queries = {
    2: "select id, tip, message, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
 },
    insertQueries: {insertTip: "insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));"},
-   deleteQueries: {}
+   deleteQueries: {deleteTipById: "delete from tips where id=?;"}
   
 }
 
 const getTipsForSelectedPeriod = (mode, setTips) =>{
    db.transaction((transaction)=>{
       transaction.executeSql(queries.selectQueries[mode], [], (_, {rows: {_array}})=>{
-      setTips(calculateTips(_array));
+      if(_array)
+         setTips(calculateTips(_array));
       });
    });
 }
@@ -42,17 +43,23 @@ const getArrayOfTipObj = (mode, setTipsArray) =>{
    db.transaction((transaction)=>{
       transaction.executeSql(queries.selectQueries[mode], [], (_,{rows:{_array}})=>{
          setTipsArray(_array);
-        
       });
    });
 }
 
+const deleteTipById = (id, setSuccessDelete) =>{
+   db.transaction( async(transaction)=>{
+     await transaction.executeSql(queries.deleteQueries.deleteTipById, [id.toString()], (transaction, result)=>{
+         setSuccessDelete(true);   
+      }, (err)=>{console.log("err")});
+   });
+}
+
 const calculateTips = (array) => {
-   
-   return (array==null) ? 0 : array.map((tipObj)=>{return parseInt(tipObj.tip);})
+   return (array.length===0) ? 0 : array.map((tipObj)=>{return parseInt(tipObj.tip);})
                .reduce((acc, tip)=>{return acc + tip;});
 
 }
 
 
-export {createDatabase, createTipsTable, getTipsForSelectedPeriod, getArrayOfTipObj, insertTip};
+export {createDatabase, createTipsTable, getTipsForSelectedPeriod, getArrayOfTipObj, insertTip, deleteTipById};
