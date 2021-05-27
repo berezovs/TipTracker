@@ -76,15 +76,12 @@ const TipList = ({tipsArray, refreshList}) => {
     }, [successDelete]);
 
 
-    if(tipsArray.length==0){
-        return <Text>No tips to display</Text>
-    }
 
-    else{
         return(
             <View style = {{flex: 1}}>
                 <FlatList 
                 showsVerticalScrollIndicator ={false}
+                ListEmptyComponent = {<Text>No tips to display</Text>}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor = {(item, index)=>index.toString()}
                 data = {tipsArray}
@@ -95,13 +92,14 @@ const TipList = ({tipsArray, refreshList}) => {
         
         )
     }
-}
+
 
 
 const styles = StyleSheet.create({
     container : {
         flex: 1,
         alignItems: "center",
+        justifyContent: "center"
     }
 })
 export default TipScreen;

@@ -6,7 +6,6 @@ const HeaderComponent = ({navigation}) =>{
   
   return(
     <Header
-      statusBarProps={{ barStyle: 'light-content', backgroundColor: 'red'}}
       centerComponent={{
         text: 'MyTipTracker',
         style: { color: "#fff", fontSize: 23, padding: 5 }

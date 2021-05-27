@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     tip: {
+        marginBottom: 10,
         textAlign: 'center',
     }
 })
