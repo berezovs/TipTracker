@@ -17,7 +17,7 @@ const TipItem = ({item}) => {
 
     return(
     <View>
-        <Overlay overlayStyle={styles.modalView} isVisible={modalVisible} animationType='fade'>
+        <Overlay overlayStyle={styles.modalView} isVisible={modalVisible} animationType=''>
             <View style={styles.modalTextContainer}>
                 <Text style={styles.modalText}>Tip: {item.tip.tip}</Text>
                 <Text style={styles.modalText}>Date: {item.tip.date}</Text>

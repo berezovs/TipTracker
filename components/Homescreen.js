@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import {Text, TextInput,StyleSheet, View, Button, StatusBar} from 'react-native';
+import {Text, TextInput,StyleSheet, View} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import {Button} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
-import ButtonGroup from './ButtonGroup';
 import Header from './Header';
-import TipAmount from './TipAmount'
+import {dateFormatter} from '../utils/dateFormatter.js'
 import {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip} from '../database/database.js';
 
 
@@ -13,6 +13,8 @@ const HomeScreen = ({navigation}) => {
     const [date, setDate] = useState(new Date());
     const [tip, setTip] = useState('');
     const [message, setMessage] = useState('');
+    const [hourlyWage, setHourlyWage] = useState('');
+    const [hours, setHours] = useState('');
     const [tipMode, setTipMode] = useState(0);
     const [tips, setTips] = useState(0);
 
@@ -30,6 +32,7 @@ const HomeScreen = ({navigation}) => {
     }, [tipMode, tips]);
 
     useFocusEffect(()=>{
+        dateFormatter(date.toDateString());
         showTips();
     });
    
@@ -57,6 +60,11 @@ const HomeScreen = ({navigation}) => {
       } 
 
 
+    const onChangeWage = (wage) => {
+        setHourlyWage(wage);
+    }
+
+
     const setTipDisplayMode = (mode) => {
         setTipMode(mode);
     }
@@ -82,6 +90,11 @@ const HomeScreen = ({navigation}) => {
         setTip(tip);
     }
 
+
+    const onChangehours = (hours) => {
+        setHours(hours);
+    }
+
     const addTip = () => {
         const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
         insertTip(tip, message, stringDate);
@@ -94,56 +107,82 @@ const HomeScreen = ({navigation}) => {
         getTipsForSelectedPeriod(tipMode, setTips);  
     }
 
-
-
-
     return (
-      <View style = {styles.container}>
-            <Header navigation = {navigation}/>
-            <ButtonGroup setTipDisplayMode={setTipDisplayMode}/>
-            <TipAmount tips={tips}/>
-            <TextInput 
-                style = {styles.input}
-                value = {tip}
-                keyboardType = 'numeric'
-                placeholder = 'enter a tip'
-                onChangeText = {onChangeTip}
-            />
-            <TextInput 
-                style = {styles.input}
-                value = {message}
-                keyboardType = 'default'
-                placeholder = 'enter a message'
-                onChangeText = {onChangeMessage}
-            />
-            <View style = {styles.date}>
-                <Text style = {styles.currentDate}>{(date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()}</Text>
-                <Text style = {styles.changeBtn} onPress = {showDatePicker}>change</Text>
+        <View style={styles.container}>
+            <View style = {styles.form}>
+                    <Header navigation = {navigation}/>
+                    <Text style={styles.title}>Enter Your Tip</Text>
+                    <View style = {styles.date}>
+                        <Text style = {styles.currentDate}>{date.toDateString()}</Text>
+                        <Text style = {styles.changeBtn} onPress = {showDatePicker}>change</Text>
+                    </View>
+                    <TextInput 
+                        style = {styles.input}
+                        value = {tip}
+                        keyboardType = 'numeric'
+                        returnKeyType="done"
+                        placeholder = 'enter a tip'
+                        onChangeText = {onChangeTip}
+                    />
+                    <TextInput 
+                        style = {styles.input}
+                        value = {hourlyWage}
+                        keyboardType = 'numeric'
+                        returnKeyType="done"
+                        placeholder = 'enter hourly wage'
+                        onChangeText = {onChangeWage}
+                    />
+                    <TextInput 
+                        style = {styles.input}
+                        value = {hours}
+                        keyboardType = 'numeric'
+                        returnKeyType="done"
+                        placeholder = 'enter hours worked'
+                        onChangeText = {onChangehours}
+                    />
+                    <TextInput 
+                        style = {styles.input}
+                        value = {message}
+                        keyboardType = 'default'
+                        returnKeyType="done"
+                        placeholder = 'add a note(optional)'
+                        onChangeText = {onChangeMessage}
+                    />
+                    <DateTimePickerModal
+                        isVisible={isDatePickerVisible}
+                        mode="date"
+                        onConfirm={handleConfirm}
+                        onCancel={hideDatePicker}
+                    />
+                    <Button title="Add tip"  onPress={addTip} buttonStyle={styles.addTip}/> 
+                    
             </View>
-            <DateTimePickerModal
-                isVisible={isDatePickerVisible}
-                mode="date"
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}
-            />
-            <Button title="Add tip"  onPress={addTip} />
-            <Button title = "Undo" />
+            <View style={styles.buttonContainer}>
                 
-      </View>
+            </View>
+        </View>
     );
   };
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+    },
+    form: {
+        flex: 2,
         alignItems: 'center',
+    },
+    title: {
+        marginTop: 10,
+        fontSize: 20,
     },
     
     input: {
-        padding: 5,
+        padding: 20,
         marginTop: 20,
         width: 300,
-        borderBottomWidth: 1,
-        borderColor: 'lightblue',
+        borderWidth: 1,
+        borderColor: 'lightgray',
         borderRadius: 5,
         
     },
@@ -151,18 +190,31 @@ const styles = StyleSheet.create({
     date: {
         flexDirection: "row",
         padding: 5,
-        marginTop: 20,
+        marginTop: 30,
         width: 300,
-        borderBottomWidth: 1,
-        borderColor: 'lightblue',
         justifyContent: "space-between",
     },
     currentDate: {
-        color: '#adadad'
+        color: '#adadad',
+        fontSize: 20,
     },
     changeBtn:{
         color: '#adadad',
         fontStyle: 'italic',
+        fontSize: 20,
+    },
+
+    buttonContainer: {
+        flex: 1,
+        justifyContent: 'flex-end',
+        alignItems: "center",
+    },
+
+    addTip :{
+        marginTop: 20,
+        paddingHorizontal: 123,
+        paddingVertical: 20,
+        
     }
  
 })
