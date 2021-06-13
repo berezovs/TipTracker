@@ -30,7 +30,7 @@ const TipItem = ({item}) => {
         <ListItem bottomDivider style={styles.container}>
             <ListItem.Content>
                 <ListItem.Title>Tip: {item.tip.tip}</ListItem.Title>
-                <ListItem.Subtitle>Message: {item.tip.message}</ListItem.Subtitle>
+                <ListItem.Subtitle>Message: {(item.tip.message==='') ? 'no notes' : item.tip.message}</ListItem.Subtitle>
                 <ListItem.Subtitle>Date: {item.tip.date}</ListItem.Subtitle>
             </ListItem.Content>
             <Icon Component={TouchableOpacity} name='delete-outline' color='grey' onPress={toggleConfirmationDialog}/>

@@ -4,7 +4,6 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Button} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
 import Header from './Header';
-import {dateFormatter} from '../utils/dateFormatter.js'
 import {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip} from '../database/database.js';
 
 
@@ -32,7 +31,6 @@ const HomeScreen = ({navigation}) => {
     }, [tipMode, tips]);
 
     useFocusEffect(()=>{
-        dateFormatter(date.toDateString());
         showTips();
     });
    
@@ -65,10 +63,6 @@ const HomeScreen = ({navigation}) => {
     }
 
 
-    const setTipDisplayMode = (mode) => {
-        setTipMode(mode);
-    }
-
     const showDatePicker = () => {
         setDatePickerVisibility(true);
     };
@@ -97,9 +91,10 @@ const HomeScreen = ({navigation}) => {
 
     const addTip = () => {
         const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
-        insertTip(tip, message, stringDate);
+        insertTip(tip, message, stringDate, hourlyWage, hours);
         setTip('');
         setMessage('');
+        setHours('');
         showTips();  
     }
 
@@ -156,9 +151,6 @@ const HomeScreen = ({navigation}) => {
                     />
                     <Button title="Add tip"  onPress={addTip} buttonStyle={styles.addTip}/> 
                     
-            </View>
-            <View style={styles.buttonContainer}>
-                
             </View>
         </View>
     );

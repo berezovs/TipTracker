@@ -2,6 +2,7 @@ import * as SQLite from 'expo-sqlite';
 
 
 let db = null;
+let currentWeekNumber = 0;
 
 const createDatabase = () => {
         db = SQLite.openDatabase("db.db");
@@ -9,23 +10,23 @@ const createDatabase = () => {
 }
 
 const createTipsTable = () =>{
-    // db.transaction((tx)=>{
-    //     tx.executeSql("drop table tips", [], (_,r)=>{}, (error)=>{console.log('error')})
-    // })
+   //  db.transaction((transaction)=>{
+   //     transaction.executeSql("drop table tips");
+   //  })
    db.transaction((transaction)=>{
 
-      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text NOT null, message text NOT null, date text NOT null, week text NOT NULL);", (transaction, result)=>{
+      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text, message text NOT null, date text NOT null, week text NOT NULL, wage text NOT null, hours text NOT null);", (transaction, result)=>{
       });
   })
 }
 
 const queries = {
    selectQueries : { 
-   0: "select id, tip, message, date from tips where strftime('%W', date)=strftime('%W', 'now')",
-   1: "select id, tip, message, date from tips where strftime('%m', date)=strftime('%m', 'now')",
-   2: "select id, tip, message, date from tips where strftime('%Y', date)=strftime('%Y', 'now')",
+   0: "select id, tip, message, date, wage, hours, week from tips where date >= ? and date <= ?",
+   1: "select id, tip, message, date, wage, hours from tips where strftime('%m', date)=strftime('%m', 'now')",
+   2: "select id, tip, message, date, wage, hours from tips where strftime('%Y', date)=strftime('%Y', 'now')",
 },
-   insertQueries: {insertTip: "insert into tips(tip, message, date, week) values(?, ?, ?,  strftime('%W', ?));"},
+   insertQueries: {insertTip: "insert into tips(tip, message, date, week, wage, hours) values(?, ?, ?, strftime('%W', ?), ?, ?);"},
    deleteQueries: {deleteTipById: "delete from tips where id=?;"}
   
 }
@@ -39,19 +40,22 @@ const getTipsForSelectedPeriod = (mode, setTips) =>{
    });
 }
 
-const insertTip = (tip, message, stringDate) => {
+const insertTip = (tip, message, stringDate, wage, hours) => {
    db.transaction(async (transaction)=>{
-      await transaction.executeSql(queries.insertQueries.insertTip, [tip, message, stringDate, stringDate ] ) 
+      await transaction.executeSql(queries.insertQueries.insertTip, [tip, message, stringDate, stringDate, wage, hours], (_, rs)=>{}, (_, err)=>{console.log(err)}) 
       }); 
 }
 
-const getArrayOfTipObj = (mode, setTipsArray) =>{
+const getArrayOfTipObj = (mode, setTipsArray, from, to) =>{
+   //console.log(from, to)
    db.transaction((transaction)=>{
-      transaction.executeSql(queries.selectQueries[mode], [], (_,{rows:{_array}})=>{
+      transaction.executeSql(queries.selectQueries[0], [from ,to], (_,{rows:{_array}})=>{
+         //console.log(_array)
          setTipsArray(_array);
-      });
+      }, (_, err)=>{console.log(err)});
    });
 }
+ 
 
 const deleteTipById = (id, setSuccessDelete) =>{
    db.transaction( async(transaction)=>{
@@ -66,6 +70,5 @@ const calculateTips = (array) => {
                .reduce((acc, tip)=>{return acc + tip;});
 
 }
-
 
 export {createDatabase, createTipsTable, getTipsForSelectedPeriod, getArrayOfTipObj, insertTip, deleteTipById};
