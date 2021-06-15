@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
         
     },
     space: {
-        paddingHorizontal: 150
+        paddingHorizontal: 120
     }
     
 })

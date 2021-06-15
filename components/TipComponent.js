@@ -12,6 +12,7 @@ import TipItem from './TipItem';
 
 import {createDatabase, getTipsForSelectedPeriod, getArrayOfTipObj, deleteTipById} from '../database/database.js';
 import { Button } from 'react-native-elements/dist/buttons/Button';
+import { setStatusBarTranslucent } from 'expo-status-bar';
 
 
 
@@ -139,14 +140,18 @@ const Summary = ({navigation}) =>{
 
             });
         }
-        if(!totalHoursWorked===0){
+        if(!totalHoursWorked==0){
             hourlyEarnings = totalEarnings/totalHoursWorked;
         }
        
         setSummary({
             earnings:totalEarnings.toString(),
             hoursWorked: totalHoursWorked.toString(),
-            hourlyEarnings: hourlyEarnings.toString(),
+            hourlyEarnings: hourlyEarnings
+            .toString()
+            .split('.')
+            .map((value, index)=>(index==1) ? value.substr(0,2) : value)
+            .join('.'),
         })    
     }
 
@@ -237,15 +242,15 @@ const Tips = ({navigation, route}) => {
 
         return(
             <View style = {{flex: 1, }}>
-            <View style={{flexDirection: 'row', paddingVertical: 10,}}>
-                <Icon name="chevron-left" onPress={() => navigation.goBack(null)}
+            <TouchableOpacity style={{flexDirection: 'row', paddingVertical: 10,}} onPress={() => navigation.goBack(null)}>
+                <Icon name="chevron-left" 
                 size={35} color= '#4287f5'/>
                 <Text style={{color:'#4287f5', paddingVertical: 9,}}>Back</Text>
-            </View>
+            </TouchableOpacity>
             
                 <FlatList 
                 showsVerticalScrollIndicator ={false}
-                ListEmptyComponent = {<Text>No tips to display</Text>}
+                ListEmptyComponent = {<View style={{alignItems:'center'}}><Text>No tips to display</Text></View>}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor = {(item, index)=>index.toString()}
                 data = {tips}
