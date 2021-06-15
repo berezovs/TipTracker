@@ -139,9 +139,10 @@ const Summary = ({navigation}) =>{
 
             });
         }
-
-        hourlyEarnings = totalEarnings/totalHoursWorked;
-
+        if(!totalHoursWorked===0){
+            hourlyEarnings = totalEarnings/totalHoursWorked;
+        }
+       
         setSummary({
             earnings:totalEarnings.toString(),
             hoursWorked: totalHoursWorked.toString(),

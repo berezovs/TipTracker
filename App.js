@@ -1,8 +1,9 @@
 import 'react-native-gesture-handler';
 import  React, {useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import {createDrawerNavigator, DrawerContentScrollView, DrawerItem} from '@react-navigation/drawer'; 
-import {Text, TextInput,StyleSheet, View} from 'react-native';
+import {createDrawerNavigator, DrawerContentScrollView, DrawerItem, DrawerItemList} from '@react-navigation/drawer'; 
+import {Text} from 'react-native';
+import {Icon} from 'react-native-elements'
 import TipComponent from './components/TipComponent.js';
 import Home from './components/Homescreen.js';
 
@@ -13,10 +14,14 @@ const Drawer = createDrawerNavigator();
 const DrawerContent = ({...props}) => {
   //console.log(props);
   return (
+    
     <DrawerContentScrollView {...props}>
-        <DrawerItem label="Home" onPress={()=> {props.navigation.navigate('Home')}}  style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1,}}/>
+        <DrawerItem label={() => <Text style={{fontSize: 24, }}>{'MyTipTracker'}</Text>} onPress={()=>{}} />
+        <DrawerItem label="Home"
+         onPress={()=> {props.navigation.navigate('Home')}}  style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1,}}
+         icon={({focused, color, size})=>{ <Icon color={'red'} size={0} name='menu' />}}/>
         
-        <DrawerItem label="Tip" onPress={()=> {props.navigation.navigate('Summary')}} style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1,}}/>
+        <DrawerItem label="Summary" onPress={()=> {props.navigation.navigate('Summary')}} style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1,}}/>
     </DrawerContentScrollView>
    
   )
@@ -34,7 +39,7 @@ const DrawerNavigator = () => {
 const App = () => {
   return (
     <NavigationContainer>
-      <DrawerNavigator />
+      <DrawerNavigator style={{activeBackgroundColor: '#4287f5'}}/>
     </NavigationContainer>
   );
 };
