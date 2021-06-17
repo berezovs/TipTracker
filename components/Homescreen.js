@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Text, TextInput,StyleSheet, View} from 'react-native';
+import {Text, TextInput,StyleSheet, View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Button} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
@@ -103,7 +103,7 @@ const HomeScreen = ({navigation}) => {
     }
 
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <View style = {styles.form}>
                     <Header navigation = {navigation}/>
                     <Text style={styles.title}>Enter Your Tip</Text>
@@ -111,6 +111,7 @@ const HomeScreen = ({navigation}) => {
                         <Text style = {styles.currentDate}>{date.toDateString()}</Text>
                         <Text style = {styles.changeBtn} onPress = {showDatePicker}>change</Text>
                     </View>
+                    <View>
                     <TextInput 
                         style = {styles.input}
                         value = {tip}
@@ -150,18 +151,22 @@ const HomeScreen = ({navigation}) => {
                         onCancel={hideDatePicker}
                     />
                     <Button title="Add tip"  onPress={addTip} buttonStyle={styles.addTip}/> 
-                    
+                    </View>
+                    <View style={{flex: 1}}></View>
             </View>
-        </View>
+            
+        </KeyboardAvoidingView>
     );
   };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        
     },
     form: {
-        flex: 2,
+        flex: 1,
+        justifyContent: 'flex-end',
         alignItems: 'center',
     },
     title: {

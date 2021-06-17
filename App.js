@@ -27,7 +27,7 @@ const DrawerContent = ({...props}) => {
         label="Home"
         focused={isHomeActive}
         icon={({focused, color, size})=> <AntDesign color={color} size={size} name={'home'}/>}
-         onPress={({focused, color, size})=> {props.navigation.navigate('Home'); setHomeToActive(true), setSummaryActive(false), setChartsToActive(false);}}  style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1,}}
+         onPress={({focused, color, size})=> {props.navigation.navigate('Home'); setHomeToActive(true), setSummaryActive(false), setChartsToActive(false);}}  style={{borderBottomEndRadius: 0, borderBottomColor: 'lightgrey', borderBottomWidth: 1, marginVertical: 0}}
          />
         
         <DrawerItem label="Summary" 
