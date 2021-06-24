@@ -22,7 +22,19 @@ const TipComponent = ({navigation}) => {
     
 
     return (
-      <Stack.Navigator>
+      <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#4287f5',
+        },
+        headerTitle: ({children})=><Header children={children}/>,
+        headerTitleAlign: 'center',
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+      >
         <Stack.Screen name="Summary"  component={Summary} />
         <Stack.Screen name="Tips" component={Tips} />
       </Stack.Navigator>
@@ -235,12 +247,6 @@ const Tips = ({navigation, route}) => {
 
         return(
             <View style = {{flex: 1, }}>
-            <TouchableOpacity style={{flexDirection: 'row', paddingVertical: 10,}} onPress={() => navigation.goBack(null)}>
-                <Icon name="chevron-left" 
-                size={35} color= '#4287f5'/>
-                <Text style={{color:'#4287f5', paddingVertical: 9,}}>Back</Text>
-            </TouchableOpacity>
-            
                 <FlatList 
                 showsVerticalScrollIndicator ={false}
                 ListEmptyComponent = {<View style={{alignItems:'center'}}><Text>No tips to display</Text></View>}

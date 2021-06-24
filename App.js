@@ -18,9 +18,21 @@ const Stack = createStackNavigator();
 
 const StackNavigator = () => {
   return (
-  <Stack.Navigator>
+  <Stack.Navigator
+  screenOptions={{
+    headerStyle: {
+      backgroundColor: '#4287f5',
+    },
+    headerTitle: ({children})=><Header children={children}/>,
+    headerTitleAlign: 'center',
+    headerTintColor: '#fff',
+    headerTitleStyle: {
+      fontWeight: 'bold',
+    },
+  }}
+  >
     <Stack.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name ="Add" component={Home}/>
+    <Stack.Screen name ="Add Tip" component={Home}/>
     <Stack.Screen name="Summary" options={{ headerShown: false }} component={TipComponent} />
   </Stack.Navigator>
   )
@@ -29,7 +41,7 @@ const StackNavigator = () => {
 const HomeScreen = ({navigation}) => {
   return (
     <View style={{flex: 1,alignItems: 'center', justifyContent: 'space-evenly'}}>
-      <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate('Add')}}>
+      <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate('Add Tip')}}>
       <AntDesign name='wallet' size={35} color='#fff'/>
         <Text style={{fontSize: 24, color:'#fff'}}>Add Tip</Text>
       </TouchableOpacity>
@@ -54,7 +66,7 @@ const styles=StyleSheet.create({
     paddingHorizontal: 50, 
     paddingVertical: 20, 
     borderRadius: 5, 
-    marginTop: 40,
+    marginTop: 20,
    
   }
 })

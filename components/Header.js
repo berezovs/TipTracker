@@ -2,34 +2,27 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Header, Icon} from 'react-native-elements'
 
-const HeaderComponent = () =>{
+const HeaderComponent = ({children}) =>{
   
   return(
-    <Header
-      centerComponent={{
-        text: 'MyTipTracker',
-        style: { color: "#fff", fontSize: 23, padding: 5 }
-      }}
-      placement="center"
-      rightContainerStyle={{}}
-      statusBarProps={{}}
-
-
-      
-  />
+    <View style={styles.container}>
+      <Text style={styles.logo}>MyTipTracker</Text >
+      <Text style={styles.screenName}>{children}</Text>
+    </View>
   )}
 
-  const MenuIcon = ({navigation}) => {  
-    const openSideMenu = () => {
-      navigation.openDrawer();
-    }
-    return (
-      <Icon
-      name='menu'
-      color = '#fff'
-      iconStyle = {{padding: 5}}
-      onPress = {openSideMenu}/>
+    const styles = StyleSheet.create({
+      container: {
+        alignItems: 'center',
+      },
+      logo: {
+        color: '#fff',
+        fontSize: 24,
 
-  )}
-
+      },
+       screenName: {
+         color: '#fff',
+         fontSize: 16,
+       }
+    });
   export default HeaderComponent;
