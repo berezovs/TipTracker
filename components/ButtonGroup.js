@@ -14,7 +14,7 @@ const Buttons = ({navigation, setTipDisplayMode})=>{
     return (
         <ButtonGroup
             buttons={options}
-            containerStyle={{ width : 200, height: 30}}
+            containerStyle={{ width : 350, height: 30}}
             disabledStyle={{}}
             disabledTextStyle={{}}
             disabledSelectedStyle={{}}

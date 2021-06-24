@@ -28,10 +28,21 @@ const TipAmount = ({date, handlers, summary}) =>{
         <View style={styles.container}>
             <Text style = {styles.header}>Summary</Text>
             <View style={styles.summaryContent}>
-            <Text style={styles.text}>Week: {start}-{end}</Text>
-            <Text style={styles.text}>Total earnings: {sum.earnings}</Text>
-            <Text style={styles.text}>Total hours worked: {sum.hoursWorked}</Text>
-            <Text style={styles.text}>Hourly earnings: {sum.hourlyEarnings}</Text>
+                <View style={styles.section}>
+                    <Text style={styles.text}>Week: {start}-{end}</Text>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.text}>Total earnings:</Text>
+                    <Text style={styles.text}>${sum.earnings}</Text>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.text}>Hourly earnings:</Text>
+                    <Text style={styles.text}>${sum.hourlyEarnings}</Text>
+                </View>
+                <View style={styles.section}>
+                    <Text style={styles.text}>Total hours worked:</Text>
+                    <Text style={styles.text}>${sum.hoursWorked}</Text>
+                </View>
             </View>
             <View style={styles.buttons}>
                 <Icon name='chevron-left' size={50} color='#4287f5' onPress={getPrevious}/>
@@ -44,19 +55,27 @@ const TipAmount = ({date, handlers, summary}) =>{
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
+        alignItems:'center',
+
     },
     summaryContent: {
         minWidth: '90%',
-        alignItems: 'flex-start',
         justifyContent: 'flex-start'
     },
     header: {
         fontSize: 20,
         padding: 10,
     },
+    section: {
+        flexDirection: 'row',
+        padding: 10,
+        justifyContent: 'space-between',
+        borderBottomColor: 'lightgrey',
+        borderBottomWidth: 1,
+    },
     text: {
-       fontSize: 16,
+       fontSize: 20,
+       color:'grey',
        marginBottom: 5,
     },
     buttons: {
