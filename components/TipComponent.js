@@ -22,9 +22,7 @@ const TipComponent = ({navigation}) => {
     
 
     return (
-      <Stack.Navigator screenOptions={{
-        header: () =>(<Header navigation={navigation}/>),
-    }}>
+      <Stack.Navigator>
         <Stack.Screen name="Summary"  component={Summary} />
         <Stack.Screen name="Tips" component={Tips} />
       </Stack.Navigator>
@@ -33,7 +31,6 @@ const TipComponent = ({navigation}) => {
 
 const Summary = ({navigation}) =>{
     const [periodType, setPeriodType] = useState(0);
-    const [tips, setTips] = useState(0);
     const [tipsArray, setTipsArray] = useState([]);
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date()); 

@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import {Header, Icon} from 'react-native-elements'
 
-const HeaderComponent = ({navigation}) =>{
+const HeaderComponent = () =>{
   
   return(
     <Header
@@ -10,8 +10,6 @@ const HeaderComponent = ({navigation}) =>{
         text: 'MyTipTracker',
         style: { color: "#fff", fontSize: 23, padding: 5 }
       }}
-      
-      leftComponent={<MenuIcon navigation={navigation}/>}
       placement="center"
       rightContainerStyle={{}}
       statusBarProps={{}}

@@ -105,7 +105,6 @@ const HomeScreen = ({navigation}) => {
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
             <View style = {styles.form}>
-                    <Header navigation = {navigation}/>
                     <Text style={styles.title}>Enter Your Tip</Text>
                     <View style = {styles.date}>
                         <Text style = {styles.currentDate}>{date.toDateString()}</Text>
