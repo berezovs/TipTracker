@@ -199,7 +199,11 @@ const Summary = ({navigation}) =>{
 
 
     const showTips = () => {
-        navigation.navigate('Tips', {periodType: periodType, from: lightFormat(startDate, 'yyyy-MM-dd'), to: lightFormat(endDate, 'yyyy-MM-dd')});
+        navigation.navigate('Tips', {periodType: periodType, 
+            from: lightFormat(startDate, 'yyyy-MM-dd'), 
+            to: lightFormat(endDate, 'yyyy-MM-dd'), 
+            dateString: {startDateString: startDate.toDateString(), endDateString: endDate.toDateString() }
+        });
         
     }
     
@@ -207,7 +211,7 @@ const Summary = ({navigation}) =>{
     return(
         <TouchableOpacity style={styles.container} onPress={showTips}>
             <ButtonGroup setTipDisplayMode={setPeriodType} />
-            <TipAmount date={{startDate: startDate.toDateString(), endDate: endDate.toDateString()}} handlers={{incrementIndex:incrementIndex, decrementIndex:decrementIndex}} summary={summary}/>  
+            <TipAmount date={{startDate: startDate.toDateString(), endDate: endDate.toDateString()}} handlers={{incrementIndex:incrementIndex, decrementIndex:decrementIndex}} summary={summary} />  
         </TouchableOpacity>
     )
 }
@@ -216,7 +220,8 @@ const Tips = ({navigation, route}) => {
     
     const [tips, setTips] = useState([]);
     const[success, setSuccessDelete] = useState(false);
-    const {periodType, from, to} = route.params;
+    const {periodType, from, to, dateString} = route.params;
+    
 
 
     useEffect(()=>{
@@ -242,11 +247,13 @@ const Tips = ({navigation, route}) => {
     }
 
 
-    
-
 
         return(
             <View style = {{flex: 1, }}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Summary for {dateString.startDateString}</Text>
+                    <Text style={styles.title}>to {dateString.endDateString}</Text>
+                </View>
                 <FlatList 
                 showsVerticalScrollIndicator ={false}
                 ListEmptyComponent = {<View style={{alignItems:'center'}}><Text>No tips to display</Text></View>}
@@ -268,6 +275,14 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center"
+    },
+    titleContainer:{
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 20,
+        color: 'grey',
+
     }
 })
 export default TipComponent;
