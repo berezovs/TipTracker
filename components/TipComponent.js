@@ -4,7 +4,7 @@ import {Icon} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { eachWeekOfInterval,eachMonthOfInterval, eachYearOfInterval, isThisWeek, startOfWeek, lastDayOfWeek, lightFormat, isThisMonth, lastDayOfMonth, startOfMonth, startOfYear, lastDayOfYear} from 'date-fns'
+import { eachWeekOfInterval,eachMonthOfInterval, eachYearOfInterval, isThisWeek, startOfWeek, lastDayOfWeek, lightFormat, isThisMonth, lastDayOfMonth, startOfMonth, startOfYear, lastDayOfYear, setYear} from 'date-fns'
 import Header from './Header';
 import TipAmount from './TipAmount';
 import ButtonGroup from './ButtonGroup';
@@ -49,6 +49,7 @@ const Summary = ({navigation}) =>{
     const [currentIndex, setCurrIndex] = useState(0);
     const [summary, setSummary] = useState({});
     const [intervals, setIntervals] = useState([]);
+    const [yearOffset, setYearOffset] = useState(0);
 
 
     createDatabase();
@@ -63,11 +64,16 @@ const Summary = ({navigation}) =>{
 
 
     useEffect(()=>{
+        setYearOffset(0);
         getIntervals();
     }, [periodType]);
 
+    useEffect(()=>{
+        getIntervals();
+    }, [yearOffset])
+
     useEffect(()=> {
-        getCurrentInterval();
+        setPeriodDates();
     }, [intervals])
 
 
@@ -75,14 +81,14 @@ const Summary = ({navigation}) =>{
         setPeriodDates();
     }, [currentIndex])
 
-    useEffect(()=>{
-    }, [startDate, endDate])
+   
+
     useFocusEffect(
         React.useCallback(()=>{
             showTipsList()
             calculateSummary();
         return ()=>null;
-        }, [tipsArray,])
+        }, [tipsArray])
        
     )
 
@@ -99,8 +105,8 @@ const Summary = ({navigation}) =>{
         let current = new Date();
         let intvls = [];
         let options = {
-            start: new Date(current.getFullYear(), 0, 1),
-            end: new Date(current.getFullYear(), 11, 31)
+            start: new Date((parseInt(current.getFullYear())+yearOffset).toString(), 0, 1),
+            end: new Date((parseInt(current.getFullYear())+yearOffset).toString(), 11, 31)
         }
         if(periodType==0){
             intvls = eachWeekOfInterval(options, {weekStartsOn: 1});
@@ -112,21 +118,40 @@ const Summary = ({navigation}) =>{
             intvls = eachYearOfInterval(options)
         }
         setIntervals(intvls);
+        if(yearOffset<0){
+            setCurrIndex(intervals.length-1);
+        }else{
+            setCurrIndex(0);
+        }
     }
 
     
 
     const incrementIndex = () => {
-        if(!(currentIndex>=intervals.length)){
-            setCurrIndex(currentIndex+1);
+        if(periodType==0 || periodType==1){
+            if(!(currentIndex>=intervals.length-1)){
+                setCurrIndex(currentIndex+1);
+            }else{
+                setYearOffset(yearOffset+1);
+            }
         }
-            
+        else if(periodType==2){
+            setYearOffset(yearOffset+1);
+        }
+        
     }
 
     const decrementIndex = () => {
-        if(!(currentIndex<=0)){
-            setCurrIndex(currentIndex-1);
-        }      
+        if(periodType==0||periodType==1){
+            if(!(currentIndex<=0)){
+                setCurrIndex(currentIndex-1);
+            }
+            else{
+                setYearOffset(yearOffset-1);
+            }   
+        }else if(periodType==2){
+            setYearOffset(yearOffset-1);
+        }
     }
 
 
@@ -154,14 +179,14 @@ const Summary = ({navigation}) =>{
             .split('.')
             .map((value, index)=>(index==1) ? value.substr(0,2) : value)
             .join('.'),
-        })    
+        });    
     }
 
     const setPeriodDates = () => {
         
         if(periodType===2){
-            setStartDate(startOfYear(new Date()))
-            setEndDate(lastDayOfYear(new Date()))
+            setStartDate(startOfYear(intervals[currentIndex]));
+            setEndDate(lastDayOfYear(intervals[currentIndex]));
         }
         else if(periodType===0){
             setStartDate(startOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
@@ -256,7 +281,7 @@ const Tips = ({navigation, route}) => {
                 </View>
                 <FlatList 
                 showsVerticalScrollIndicator ={false}
-                ListEmptyComponent = {<View style={{alignItems:'center'}}><Text>No tips to display</Text></View>}
+                ListEmptyComponent = {<View style={{alignItems:'center', marginTop: 10}}><Text style={{fontSize: 16}}>No tips to display</Text></View>}
                 showsHorizontalScrollIndicator={false}
                 keyExtractor = {(item, index)=>index.toString()}
                 data = {tips}
@@ -277,6 +302,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
     titleContainer:{
+        marginTop: 10,
         alignItems: 'center',
     },
     title: {
