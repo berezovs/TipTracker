@@ -4,12 +4,12 @@ import { ButtonGroup } from "react-native-elements";
 import { useFocusEffect } from '@react-navigation/native';
 
 
-const Buttons = ({navigation, setTipDisplayMode})=>{
+const Buttons = ({navigation, setPeriodType})=>{
     const options = ["Week", "Month", "Year"];
     const [selectedIndex, setSelectedIndex] = useState(0)
 
     useEffect(()=>{
-        setTipDisplayMode(selectedIndex)
+        setPeriodType(selectedIndex);
     }, [selectedIndex])
     return (
         <ButtonGroup

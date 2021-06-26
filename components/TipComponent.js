@@ -4,7 +4,16 @@ import {Icon} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { eachWeekOfInterval,eachMonthOfInterval, eachYearOfInterval, isThisWeek, startOfWeek, lastDayOfWeek, lightFormat, isThisMonth, lastDayOfMonth, startOfMonth, startOfYear, lastDayOfYear} from 'date-fns'
+import {addWeeks, 
+        addMonths, 
+        addYears, 
+        startOfWeek, 
+        lastDayOfWeek, 
+        lightFormat, 
+        lastDayOfMonth, 
+        startOfMonth, 
+        startOfYear, 
+        lastDayOfYear} from 'date-fns'
 import Header from './Header';
 import TipAmount from './TipAmount';
 import ButtonGroup from './ButtonGroup';
@@ -42,176 +51,169 @@ const TipComponent = ({navigation}) => {
 }
 
 const Summary = ({navigation}) =>{
-    const [periodType, setPeriodType] = useState(0);
-    const [tipsArray, setTipsArray] = useState([]);
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date()); 
-    const [currentIndex, setCurrIndex] = useState(0);
-    const [summary, setSummary] = useState({});
-    const [intervals, setIntervals] = useState([]);
+    const PERIOD_TYPES = {
+        WEEK: 0,
+        MONTH: 1,
+        YEAR: 2,
+    }
 
-
-    createDatabase();
-
-    useEffect(()=>{
-        getIntervals();
-        getCurrentInterval();
-        setPeriodDates();  
-        showTipsList();
-        calculateSummary();
-    }, [])
+    const[periodType, setPeriodType] = useState(PERIOD_TYPES.WEEK);
+    const[currentPeriod, setCurrentPeriod] = useState(new Date());
+    const[periodDates, setPeriodDates] = useState({startDate: new Date(), endDate: new Date()});
+    const[offset, setOffset] = useState(0);
+    const[tips, setTips] = useState([]);
 
 
     useEffect(()=>{
-        getIntervals();
+        //setStart and endDates,
+        setDates();
+        //calculate summary details
+    }, []);
+
+    useEffect(()=>{
+        //setStart and endDates
+        setOffset(0);
+        setDates();
+        //calculate summary details
     }, [periodType]);
 
-    useEffect(()=> {
-        getCurrentInterval();
-    }, [intervals])
+
+    useEffect(()=>{
+    }, [periodDates])
 
 
     useEffect(()=>{
-        setPeriodDates();
-    }, [currentIndex])
+        setDates();
+    }, [currentPeriod]);
 
     useEffect(()=>{
-    }, [startDate, endDate])
-    useFocusEffect(
-        React.useCallback(()=>{
-            showTipsList()
-            calculateSummary();
-        return ()=>null;
-        }, [tipsArray,])
+        //when the offset changes update the date to the next or the previous one
+        changePeriod();
+        //calculate summary details
+    }, [offset])
+
+    const changePeriod = () => {
+        if(periodType===PERIOD_TYPES.WEEK){
+            setCurrentPeriod(addWeeks(new Date(), offset))
+        }
+        else if(periodType===PERIOD_TYPES.MONTH){
+            setCurrentPeriod(addMonths(new Date(), offset))
+        }else if(periodType===PERIOD_TYPES.YEAR){
+            setCurrentPeriod(addYears(new Date(), offset))
+        }
+    }
+
+    const setDates = () => {
+        if(periodType===PERIOD_TYPES.WEEK){
+            setPeriodDates({startDate: startOfWeek(currentPeriod, {weekStartsOn: 1}),
+                            endDate: lastDayOfWeek(currentPeriod, {weekStartsOn: 1})});
+            //console.log(PERIOD_TYPES.WEEK)
+        }
+        else if(periodType===PERIOD_TYPES.MONTH){
+            setPeriodDates({startDate: startOfMonth(currentPeriod),
+                            endDate: lastDayOfMonth(currentPeriod)});
+            //console.log(PERIOD_TYPES.MONTH)
+        }
+        else if(periodType===PERIOD_TYPES.YEAR){
+            setPeriodDates({startDate: startOfYear(currentPeriod),
+                endDate: lastDayOfYear(currentPeriod)});
+            //console.log(PERIOD_TYPES.YEAR)
+        }
+    }
+
+
+    const incrementOffset = () => {
+        setOffset(offset+1);
+    }
+
+    const decrementOffset = () => {
+        setOffset(offset-1);
+    }
+    // const calculateSummary = ()=> {
+    //     let totalEarnings = 0;
+    //     let totalHoursWorked = 0;
+    //     let hourlyEarnings = 0;
+
+    //     if(tipsArray.length!=0){
+    //         tipsArray.forEach((tipObj)=>{
+    //             totalHoursWorked+=parseFloat(tipObj.hours);
+    //             totalEarnings=totalEarnings+parseFloat(tipObj.tip)+(parseFloat(tipObj.wage)*parseFloat(tipObj.hours));
+
+    //         });
+    //     }
+    //     if(!totalHoursWorked==0){
+    //         hourlyEarnings = totalEarnings/totalHoursWorked;
+    //     }
        
-    )
+    //     setSummary({
+    //         earnings:totalEarnings.toString(),
+    //         hoursWorked: totalHoursWorked.toString(),
+    //         hourlyEarnings: hourlyEarnings
+    //         .toString()
+    //         .split('.')
+    //         .map((value, index)=>(index==1) ? value.substr(0,2) : value)
+    //         .join('.'),
+    //     })    
+    // }
 
-
-
-    const showTipsList = () => {
-        getArrayOfTipObj(periodType, setTipsArray, lightFormat(startDate, 'yyyy-MM-dd'), lightFormat(endDate, 'yyyy-MM-dd'));
-    }
-
-
-
-    const getIntervals = () =>{
+    // const setPeriodDates = () => {
         
-        let current = new Date();
-        let intvls = [];
-        let options = {
-            start: new Date(current.getFullYear(), 0, 1),
-            end: new Date(current.getFullYear(), 11, 31)
-        }
-        if(periodType==0){
-            intvls = eachWeekOfInterval(options, {weekStartsOn: 1});
-        }
-        else if(periodType==1){
-            intvls = eachMonthOfInterval(options);
-        }
-        else if(periodType==2){
-            intvls = eachYearOfInterval(options)
-        }
-        setIntervals(intvls);
-    }
+    //     if(periodType===2){
+    //         setStartDate(startOfYear(new Date()))
+    //         setEndDate(lastDayOfYear(new Date()))
+    //     }
+    //     else if(periodType===0){
+    //         setStartDate(startOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
+    //         setEndDate(lastDayOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
+    //     }
+    //     else if(periodType===1){
+    //         setStartDate(startOfMonth(intervals[currentIndex]));
+    //         setEndDate(lastDayOfMonth(intervals[currentIndex]));
+    //     }
+    // }
 
-    
-
-    const incrementIndex = () => {
-        if(!(currentIndex>=intervals.length)){
-            setCurrIndex(currentIndex+1);
-        }
+    // const getCurrentInterval = () => {
+    //     if(periodType==0){
+    //         for(let i=0; i<intervals.length; ++i){
+    //             if(isThisWeek(intervals[i])) {
+    //                 setCurrIndex(i);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    //     else if(periodType==1){
             
-    }
-
-    const decrementIndex = () => {
-        if(!(currentIndex<=0)){
-            setCurrIndex(currentIndex-1);
-        }      
-    }
-
-
-    const calculateSummary = ()=> {
-        let totalEarnings = 0;
-        let totalHoursWorked = 0;
-        let hourlyEarnings = 0;
-
-        if(tipsArray.length!=0){
-            tipsArray.forEach((tipObj)=>{
-                totalHoursWorked+=parseFloat(tipObj.hours);
-                totalEarnings=totalEarnings+parseFloat(tipObj.tip)+(parseFloat(tipObj.wage)*parseFloat(tipObj.hours));
-
-            });
-        }
-        if(!totalHoursWorked==0){
-            hourlyEarnings = totalEarnings/totalHoursWorked;
-        }
-       
-        setSummary({
-            earnings:totalEarnings.toString(),
-            hoursWorked: totalHoursWorked.toString(),
-            hourlyEarnings: hourlyEarnings
-            .toString()
-            .split('.')
-            .map((value, index)=>(index==1) ? value.substr(0,2) : value)
-            .join('.'),
-        })    
-    }
-
-    const setPeriodDates = () => {
-        
-        if(periodType===2){
-            setStartDate(startOfYear(new Date()))
-            setEndDate(lastDayOfYear(new Date()))
-        }
-        else if(periodType===0){
-            setStartDate(startOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
-            setEndDate(lastDayOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
-        }
-        else if(periodType===1){
-            setStartDate(startOfMonth(intervals[currentIndex]));
-            setEndDate(lastDayOfMonth(intervals[currentIndex]));
-        }
-    }
-
-    const getCurrentInterval = () => {
-        if(periodType==0){
-            for(let i=0; i<intervals.length; ++i){
-                if(isThisWeek(intervals[i])) {
-                    setCurrIndex(i);
-                    return;
-                }
-            }
-        }
-        else if(periodType==1){
-            
-            for(let i=0; i<intervals.length; ++i){
-                if(isThisMonth(intervals[i])){
-                    setCurrIndex(i);
-                    return;
-                }
-            }
-        }
-        else if(periodType==2){
-            setCurrIndex(0);
-        }
-    }
+    //         for(let i=0; i<intervals.length; ++i){
+    //             if(isThisMonth(intervals[i])){
+    //                 setCurrIndex(i);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    //     else if(periodType==2){
+    //         setCurrIndex(0);
+    //     }
+    // }
 
 
 
     const showTips = () => {
-        navigation.navigate('Tips', {periodType: periodType, 
-            from: lightFormat(startDate, 'yyyy-MM-dd'), 
-            to: lightFormat(endDate, 'yyyy-MM-dd'), 
-            dateString: {startDateString: startDate.toDateString(), endDateString: endDate.toDateString() }
-        });
+        // navigation.navigate('Tips', {periodType: periodType, 
+        //     from: lightFormat(startDate, 'yyyy-MM-dd'), 
+        //     to: lightFormat(endDate, 'yyyy-MM-dd'), 
+        //     dateString: {startDateString: startDate.toDateString(), endDateString: endDate.toDateString() }
+        // });
         
     }
     
 
     return(
         <TouchableOpacity style={styles.container} onPress={showTips}>
-            <ButtonGroup setTipDisplayMode={setPeriodType} />
-            <TipAmount date={{startDate: startDate.toDateString(), endDate: endDate.toDateString()}} handlers={{incrementIndex:incrementIndex, decrementIndex:decrementIndex}} summary={summary} />  
+            <ButtonGroup setPeriodType={setPeriodType} />
+            <TipAmount 
+            date={{startDate: periodDates.startDate.toDateString(), endDate: periodDates.endDate.toDateString()}} 
+            handlers={{incrementIndex:incrementOffset, decrementIndex:decrementOffset}} 
+            summary={null} />  
         </TouchableOpacity>
     )
 }
