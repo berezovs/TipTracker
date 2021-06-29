@@ -5,15 +5,15 @@ import { eachWeekOfInterval, getISOWeek, endOfWeek, startOfWeek, lastDayOfWeek }
 
 const TipAmount = ({date, handlers, summary}) =>{
    
-   const[start, setStart] = useState(date.startDate)
-   const[end, setEnd] = useState(date.endDate)
-   const[sum, setSummary] = useState(summary)
+   const[start, setStart] = useState(date.startDate);
+   const[end, setEnd] = useState(date.endDate);
+   const[sum, setSummary] = useState(summary);
     
     useEffect(()=>{
         setStart(date.startDate);
         setEnd(date.endDate);
         setSummary(summary);
-    }, [date, summary])
+    }, [date, summary]);
    
     const getPrevious = () => {
        handlers.decrementIndex();
