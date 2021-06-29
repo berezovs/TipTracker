@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react'
+import React, {useEffect, useState} from 'react'
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import {Icon} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
@@ -19,7 +19,7 @@ import TipAmount from './TipAmount';
 import ButtonGroup from './ButtonGroup';
 import TipItem from './TipItem';
 
-import {createDatabase, getTipsForSelectedPeriod, getArrayOfTipObj, deleteTipById} from '../database/database.js';
+import {createDatabase, getArrayOfTipObj, deleteTipById} from '../database/database.js';
 
 
 
@@ -62,9 +62,11 @@ const Summary = ({navigation}) =>{
     const[periodDates, setPeriodDates] = useState({startDate: new Date(), endDate: new Date()});
     const[offset, setOffset] = useState(0);
     const[tips, setTips] = useState([]);
+    const[summary, setSummary] = useState({});
 
 
     useEffect(()=>{
+        createDatabase();
         //setStart and endDates,
         setDates();
         //calculate summary details
@@ -79,6 +81,7 @@ const Summary = ({navigation}) =>{
 
 
     useEffect(()=>{
+        getTips();
     }, [periodDates])
 
 
@@ -90,7 +93,17 @@ const Summary = ({navigation}) =>{
         //when the offset changes update the date to the next or the previous one
         changePeriod();
         //calculate summary details
-    }, [offset])
+    }, [offset]);
+
+    useEffect(()=>{
+        calculateSummary();
+    }, [tips]);
+
+    useEffect(()=>{
+        console.log(summary);
+    }, [summary]);
+
+
 
     const changePeriod = () => {
         if(periodType===PERIOD_TYPES.WEEK){
@@ -107,17 +120,17 @@ const Summary = ({navigation}) =>{
         if(periodType===PERIOD_TYPES.WEEK){
             setPeriodDates({startDate: startOfWeek(currentPeriod, {weekStartsOn: 1}),
                             endDate: lastDayOfWeek(currentPeriod, {weekStartsOn: 1})});
-            //console.log(PERIOD_TYPES.WEEK)
+            
         }
         else if(periodType===PERIOD_TYPES.MONTH){
             setPeriodDates({startDate: startOfMonth(currentPeriod),
                             endDate: lastDayOfMonth(currentPeriod)});
-            //console.log(PERIOD_TYPES.MONTH)
-        }
+            }
+            
         else if(periodType===PERIOD_TYPES.YEAR){
             setPeriodDates({startDate: startOfYear(currentPeriod),
                 endDate: lastDayOfYear(currentPeriod)});
-            //console.log(PERIOD_TYPES.YEAR)
+            
         }
     }
 
@@ -129,80 +142,53 @@ const Summary = ({navigation}) =>{
     const decrementOffset = () => {
         setOffset(offset-1);
     }
-    // const calculateSummary = ()=> {
-    //     let totalEarnings = 0;
-    //     let totalHoursWorked = 0;
-    //     let hourlyEarnings = 0;
 
-    //     if(tipsArray.length!=0){
-    //         tipsArray.forEach((tipObj)=>{
-    //             totalHoursWorked+=parseFloat(tipObj.hours);
-    //             totalEarnings=totalEarnings+parseFloat(tipObj.tip)+(parseFloat(tipObj.wage)*parseFloat(tipObj.hours));
 
-    //         });
-    //     }
-    //     if(!totalHoursWorked==0){
-    //         hourlyEarnings = totalEarnings/totalHoursWorked;
-    //     }
+    const getTips = () =>{
+        getArrayOfTipObj(
+                        periodType, 
+                        setTips, 
+                        lightFormat(periodDates.startDate, 'yyyy-MM-dd'), 
+                        lightFormat(periodDates.endDate, 'yyyy-MM-dd')
+                        );
+    }
+
+
+    const calculateSummary = ()=> {
+        let totalEarnings = 0;
+        let totalHoursWorked = 0;
+        let hourlyEarnings = 0;
+
+        if(tips.length!=0){
+            tips.forEach((tipObj)=>{
+                totalHoursWorked+=parseFloat(tipObj.hours);
+                totalEarnings=totalEarnings+parseFloat(tipObj.tip)+(parseFloat(tipObj.wage)*parseFloat(tipObj.hours));
+            });
+        }
+        if(!totalHoursWorked==0){
+            hourlyEarnings = totalEarnings/totalHoursWorked;
+        }
        
-    //     setSummary({
-    //         earnings:totalEarnings.toString(),
-    //         hoursWorked: totalHoursWorked.toString(),
-    //         hourlyEarnings: hourlyEarnings
-    //         .toString()
-    //         .split('.')
-    //         .map((value, index)=>(index==1) ? value.substr(0,2) : value)
-    //         .join('.'),
-    //     })    
-    // }
+        setSummary({
+            earnings:totalEarnings.toString(),
+            hoursWorked: totalHoursWorked.toString(),
+            hourlyEarnings: hourlyEarnings
+            .toString()
+            .split('.')
+            .map((value, index)=>(index==1) ? value.substr(0,2) : value)
+            .join('.'),
+        })    
+    }
 
-    // const setPeriodDates = () => {
-        
-    //     if(periodType===2){
-    //         setStartDate(startOfYear(new Date()))
-    //         setEndDate(lastDayOfYear(new Date()))
-    //     }
-    //     else if(periodType===0){
-    //         setStartDate(startOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
-    //         setEndDate(lastDayOfWeek(intervals[currentIndex], {weekStartsOn: 1}));
-    //     }
-    //     else if(periodType===1){
-    //         setStartDate(startOfMonth(intervals[currentIndex]));
-    //         setEndDate(lastDayOfMonth(intervals[currentIndex]));
-    //     }
-    // }
-
-    // const getCurrentInterval = () => {
-    //     if(periodType==0){
-    //         for(let i=0; i<intervals.length; ++i){
-    //             if(isThisWeek(intervals[i])) {
-    //                 setCurrIndex(i);
-    //                 return;
-    //             }
-    //         }
-    //     }
-    //     else if(periodType==1){
-            
-    //         for(let i=0; i<intervals.length; ++i){
-    //             if(isThisMonth(intervals[i])){
-    //                 setCurrIndex(i);
-    //                 return;
-    //             }
-    //         }
-    //     }
-    //     else if(periodType==2){
-    //         setCurrIndex(0);
-    //     }
-    // }
 
 
 
     const showTips = () => {
-        // navigation.navigate('Tips', {periodType: periodType, 
-        //     from: lightFormat(startDate, 'yyyy-MM-dd'), 
-        //     to: lightFormat(endDate, 'yyyy-MM-dd'), 
-        //     dateString: {startDateString: startDate.toDateString(), endDateString: endDate.toDateString() }
-        // });
+        navigation.navigate('Tips', {periodType: periodType, 
+            from: lightFormat(periodDates.startDate, 'yyyy-MM-dd'), 
+            to: lightFormat(periodDates.endDate, 'yyyy-MM-dd'), 
+            dateString: {startDateString: periodDates.startDate.toDateString(), endDateString: periodDates.endDate.toDateString() }
+        });
         
     }
     
@@ -213,7 +199,7 @@ const Summary = ({navigation}) =>{
             <TipAmount 
             date={{startDate: periodDates.startDate.toDateString(), endDate: periodDates.endDate.toDateString()}} 
             handlers={{incrementIndex:incrementOffset, decrementIndex:decrementOffset}} 
-            summary={null} />  
+            summary={summary} />  
         </TouchableOpacity>
     )
 }

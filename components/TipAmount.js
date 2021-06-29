@@ -33,15 +33,15 @@ const TipAmount = ({date, handlers, summary}) =>{
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.text}>Total earnings:</Text>
-                    <Text style={styles.text}>${"sum.earnings"}</Text>
+                    <Text style={styles.text}>${sum.earnings}</Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.text}>Hourly earnings:</Text>
-                    <Text style={styles.text}>${"sum.hourlyEarnings"}</Text>
+                    <Text style={styles.text}>${sum.hourlyEarnings}</Text>
                 </View>
                 <View style={styles.section}>
                     <Text style={styles.text}>Total hours worked:</Text>
-                    <Text style={styles.text}>${"sum.hoursWorked"}</Text>
+                    <Text style={styles.text}>${sum.hoursWorked}</Text>
                 </View>
             </View>
             <View style={styles.buttons}>
