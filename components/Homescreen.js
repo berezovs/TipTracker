@@ -3,7 +3,6 @@ import {Text, TextInput,StyleSheet, View, KeyboardAvoidingView, ScrollView} from
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Button} from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native';
-import Header from './Header';
 import {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip} from '../database/database.js';
 
 
@@ -14,25 +13,24 @@ const HomeScreen = ({navigation}) => {
     const [message, setMessage] = useState('');
     const [hourlyWage, setHourlyWage] = useState('');
     const [hours, setHours] = useState('');
-    const [tipMode, setTipMode] = useState(0);
-    const [tips, setTips] = useState(0);
+   
+
 
     createDatabase();
    
 
     useEffect(() => {
         createTipsTable();
-        showTips();
     }, []);
 
 
-    useEffect(() => {
-        showTips();
-    }, [tipMode, tips]);
-
-    useFocusEffect(()=>{
-        showTips();
-    });
+    useEffect(()=>{
+        console.log(tip)
+    }, [tip])
+    
+    const setSaveStatusFlag = (flag) =>{
+        alert(flag? "Tip Added!" : "Could not add tip");
+    }
    
 
     const buildDateString = (year, month, day) =>{
@@ -85,22 +83,33 @@ const HomeScreen = ({navigation}) => {
     }
 
 
-    const onChangehours = (hours) => {
+    const onChangeHours = (hours) => {
         setHours(hours);
     }
 
     const addTip = () => {
-        const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
-        insertTip(tip, message, stringDate, hourlyWage, hours);
-        setTip('');
-        setMessage('');
-        setHours('');
-        showTips();  
+        if (inputIsValid()){
+            const stringDate = buildDateString(date.getFullYear(), date.getMonth()+1, date.getDate());
+            insertTip(tip, message, stringDate, hourlyWage, hours, setSaveStatusFlag);
+            setTip('');
+            setMessage('');
+            setHours(''); 
+        }
+        else{
+            alert('Some fields are empty')
+        }
+        
+
+        
     }
 
-    const showTips = () =>{
-        getTipsForSelectedPeriod(tipMode, setTips);  
+    const inputIsValid = () =>{
+        if(tip==='' || hours ==='' || hourlyWage ===''){
+            return false;
+        }
+       return true;
     }
+
 
     return (
         <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
@@ -133,7 +142,7 @@ const HomeScreen = ({navigation}) => {
                         keyboardType = 'numeric'
                         returnKeyType="done"
                         placeholder = 'enter hours worked'
-                        onChangeText = {onChangehours}
+                        onChangeText = {onChangeHours}
                     />
                     <TextInput 
                         style = {styles.input}

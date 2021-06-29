@@ -14,7 +14,7 @@ const createTipsTable = () =>{
    //  })
    db.transaction((transaction)=>{
 
-      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text, message text NOT null, date text NOT null, week text NOT NULL, wage text NOT null, hours text NOT null);", (transaction, result)=>{
+      transaction.executeSql("create table if NOT EXISTS tips (id integer primary key autoincrement, tip text not null, message text, date text NOT null, week text NOT NULL, wage text NOT null, hours text NOT null);", (transaction, result)=>{
       });
   })
 }
@@ -39,9 +39,9 @@ const getTipsForSelectedPeriod = (mode, setTips) =>{
    });
 }
 
-const insertTip = (tip, message, stringDate, wage, hours) => {
+const insertTip = (tip, message, stringDate, wage, hours, callback) => {
    db.transaction(async (transaction)=>{
-      await transaction.executeSql(queries.insertQueries.insertTip, [tip, message, stringDate, stringDate, wage, hours], (_, rs)=>{}, (_, err)=>{console.log(err)}) 
+      await transaction.executeSql(queries.insertQueries.insertTip, [tip, message, stringDate, stringDate, wage, hours], (_, rs)=>{callback(true)}, (_, err)=>{callback(false), console.log("Hello")}) 
       }); 
 }
 
