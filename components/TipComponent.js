@@ -100,8 +100,19 @@ const Summary = ({navigation}) =>{
     }, [tips]);
 
     useEffect(()=>{
-        console.log(summary);
+       
     }, [summary]);
+
+
+    useFocusEffect(
+        React.useCallback(()=>{
+            getArrayOfTipObj(periodType, setTips,
+            lightFormat(periodDates.startDate, 'yyyy-MM-dd'), 
+            lightFormat(periodDates.endDate, 'yyyy-MM-dd'));
+        return ()=>null;
+        },[])
+       
+    )
 
 
 
