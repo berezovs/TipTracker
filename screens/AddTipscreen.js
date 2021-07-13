@@ -2,8 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {Text, TextInput,StyleSheet, View, KeyboardAvoidingView, ScrollView} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import {Button} from 'react-native-elements'
-import { useFocusEffect } from '@react-navigation/native';
-import {createDatabase, createTipsTable, getTipsForSelectedPeriod, insertTip} from '../database/database.js';
+import {createDatabase, createTipsTable, insertTip} from '../database/database.js';
 
 
 const HomeScreen = ({navigation}) => {      
@@ -201,12 +200,12 @@ const styles = StyleSheet.create({
     },
     currentDate: {
         color: '#adadad',
-        fontSize: 20,
+        fontSize: 25,
     },
     changeBtn:{
         color: '#adadad',
         fontStyle: 'italic',
-        fontSize: 20,
+        fontSize: 25,
     },
 
     buttonContainer: {

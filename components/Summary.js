@@ -1,13 +1,15 @@
 import React, {useState, useEffect}  from 'react'
 import {View, Text, StyleSheet} from 'react-native';
 import {Icon} from 'react-native-elements';
-import { eachWeekOfInterval, getISOWeek, endOfWeek, startOfWeek, lastDayOfWeek } from 'date-fns'
 
 const TipAmount = ({date, handlers, summary}) =>{
+
+    const options = ['overview', 'details'];
    
    const[start, setStart] = useState(date.startDate);
    const[end, setEnd] = useState(date.endDate);
    const[sum, setSummary] = useState(summary);
+   const [selectedIndex, setSelectedIndex] = useState(0);
     
     useEffect(()=>{
         setStart(date.startDate);
@@ -49,6 +51,7 @@ const TipAmount = ({date, handlers, summary}) =>{
                 <View style={styles.space}></View>
                 <Icon name='chevron-right' size={50} color='#4287f5' onPress={getNext}/>
             </View>
+            
         </View>
     )
 }

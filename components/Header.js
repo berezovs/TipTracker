@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {Header, Icon} from 'react-native-elements'
+
 
 const HeaderComponent = ({children}) =>{
   

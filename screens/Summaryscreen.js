@@ -1,8 +1,6 @@
 import React, {useEffect, useState} from 'react'
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import {Icon} from 'react-native-elements'
+import {View, Text, StyleSheet, FlatList, Button} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import {addWeeks, 
         addMonths, 
@@ -14,10 +12,10 @@ import {addWeeks,
         startOfMonth, 
         startOfYear, 
         lastDayOfYear} from 'date-fns'
-import Header from './Header';
-import TipAmount from './TipAmount';
-import ButtonGroup from './ButtonGroup';
-import TipItem from './TipItem';
+import Header from '../components/Header';
+import TipAmount from '../components/Summary';
+import ButtonGroup from '../components/ButtonGroup';
+import TipItem from '../components/Tip';
 
 import {createDatabase, getArrayOfTipObj, deleteTipById} from '../database/database.js';
 
@@ -28,8 +26,6 @@ const Stack = createStackNavigator();
 
 
 const TipComponent = ({navigation}) => {
-    
-
     return (
       <Stack.Navigator
       screenOptions={{
@@ -57,7 +53,13 @@ const Summary = ({navigation}) =>{
         YEAR: 2,
     }
 
+    const OPTION_TYPES = {
+        OVERVIEW: 0,
+        DETAILS: 1,
+    }
+
     const[periodType, setPeriodType] = useState(PERIOD_TYPES.WEEK);
+    const [optionType, setOptionType] = useState(OPTION_TYPES.DETAILS)
     const[currentPeriod, setCurrentPeriod] = useState(new Date());
     const[periodDates, setPeriodDates] = useState({startDate: new Date(), endDate: new Date()});
     const[offset, setOffset] = useState(0);
@@ -102,7 +104,6 @@ const Summary = ({navigation}) =>{
     useEffect(()=>{
        
     }, [summary]);
-
 
     useFocusEffect(
         React.useCallback(()=>{
@@ -205,13 +206,17 @@ const Summary = ({navigation}) =>{
     
 
     return(
-        <TouchableOpacity style={styles.container} onPress={showTips}>
+        <View style={styles.container} onPress={showTips}>
             <ButtonGroup setPeriodType={setPeriodType} />
             <TipAmount 
             date={{startDate: periodDates.startDate.toDateString(), endDate: periodDates.endDate.toDateString()}} 
             handlers={{incrementIndex:incrementOffset, decrementIndex:decrementOffset}} 
-            summary={summary} />  
-        </TouchableOpacity>
+            summary={summary} /> 
+            <View style={styles.details}>
+                <Button title="Show Details"  onPress={showTips} buttonStyle={styles.detailsButton}/> 
+            </View>
+            
+        </View>
     )
 }
 
@@ -272,8 +277,7 @@ const Tips = ({navigation, route}) => {
 const styles = StyleSheet.create({
     container : {
         flex: 1,
-        alignItems: "center",
-        justifyContent: "center"
+        alignItems: 'center',
     },
     titleContainer:{
         marginTop: 10,
@@ -283,6 +287,13 @@ const styles = StyleSheet.create({
         fontSize: 20,
         color: 'grey',
 
+    },
+    details: {
+       marginBottom: 100,
+    },
+    detailsButton: {
+        paddingHorizontal: 123,
+        paddingVertical: 20,
     }
 })
 export default TipComponent;

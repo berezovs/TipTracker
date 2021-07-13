@@ -6,8 +6,8 @@ import {createDrawerNavigator, DrawerContentScrollView, DrawerItem} from '@react
 import { createStackNavigator } from '@react-navigation/stack'; 
 import {Text} from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import TipComponent from './components/TipComponent.js';
-import Home from './components/Homescreen.js';
+import TipComponent from './screens/Summaryscreen.js';
+import Home from './screens/AddTipscreen.js';
 import Header from  './components/Header.js'
 
 
